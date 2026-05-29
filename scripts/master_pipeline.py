@@ -64,11 +64,20 @@ def translate_rna(rna_sequence):
         'UAC':'Y', 'UAU':'Y', 'UAA':'*', 'UAG':'*', 'UGA':'*'
     }
 
+    # Find the first start codon (AUG)
+    start_index = rna_sequence.find("AUG")
+    
+    # If there is no AUG in the entire sequence, we cannot produce a protein
+    if start_index == -1:
+        print("Warning: No AUG start codon found in sequence. Translation aborted.")
+        return ""
+
+
     # An empty string to accumulate the resulting protein sequence
     protein = ""
 
     # Loop through the RNA sequence in steps of 3 to read codons
-    for i in range(0, len(rna_sequence), 3):
+    for i in range(start_index, len(rna_sequence), 3):
         codon = rna_sequence[i:i+3]
 
         # Check if the codon is complete (3 nucleotides). If not, print a warning and break the loop.
