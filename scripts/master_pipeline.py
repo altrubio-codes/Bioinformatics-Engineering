@@ -14,8 +14,21 @@ The script uses a codon table to map RNA codons to their corresponding amino aci
 
 # Dictionary mapping RNA codons to their corresponding amino acids (single-letter codes)
 codon_table = {
-    "AUG": "M", "UUU": "F", "GGC": "G", "CCA": "P",
-    "UAA": "*", "UAG": "*", "UGA": "*"
+    'AUA':'I', 'AUC':'I', 'AUU':'I', 'AUG':'M',
+    'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACU':'T',
+    'AAC':'N', 'AAU':'N', 'AAA':'K', 'AAG':'K',
+    'AGC':'S', 'AGU':'S', 'AGA':'R', 'AGG':'R',
+    'CUA':'L', 'CUC':'L', 'CUG':'L', 'CUU':'L',
+    'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCU':'P',
+    'CAC':'H', 'CAU':'H', 'CAA':'Q', 'CAG':'Q',
+    'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGU':'R',
+    'GUA':'V', 'GUC':'V', 'GUG':'V', 'GUU':'V',
+    'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCU':'A',
+    'GAC':'D', 'GAU':'D', 'GAA':'E', 'GAG':'E',
+    'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGU':'G',
+    'UCA':'S', 'UCC':'S', 'UCG':'S', 'UCU':'S',
+    'UUC':'F', 'UUU':'F', 'UUA':'L', 'UUG':'L',
+    'UAC':'Y', 'UAU':'Y', 'UAA':'*', 'UAG':'*', 'UGA':'*'
 }
 
 # A function to read a FASTA file and extract the DNA sequence, ensuring it is clean and free of whitespace.
@@ -26,6 +39,7 @@ def read_and_clean_fasta(path):
     with open(path, "r") as file:
         lines = file.readlines()
     
+    # Take the second line (index 1) from the list of lines, which should contain the DNA sequence, and use the strip() method to remove any leading or trailing whitespace characters, ensuring we have a clean DNA string to work with.
     clean_dna = lines[1].strip()
     return clean_dna
 
@@ -69,13 +83,43 @@ def translate_rna(rna_string):
 # Main execution block to read the FASTA file, transcribe the DNA, and translate it into a protein sequence.
 file_path = "../sample.fasta"
 
-# We wrap the main processing steps in a try-except block to handle potential file-related errors gracefully.
-try:
-    dna_data = read_and_clean_fasta(file_path)
-    rna_data = transcribe_dna(dna_data)
-    final_protein = translate_rna(rna_data)
-    print("Final Protein product: ", final_protein)
+# Print a header to indicate the start of the pipeline execution and provide some context about the process.
+print("\n" + "="*50)
+print("     BIOINFORMATICS SEQUENCING PIPELINE (v1.7)")
+print("="*50)
+print("[STATUS] Starting pipeline execution...")
 
-# If the specified file cannot be found at the given path, we catch the FileNotFoundError and print an error message to inform the user.
+# Wrap the main pipeline execution in a try-except block to handle potential FileNotFoundError exceptions that may occur if the specified FASTA file cannot be found. This allows us to provide a user-friendly error message in such cases.
+try:
+    # Step 1: Ingestion
+    dna_data = read_and_clean_fasta(file_path)
+    print(f"[SUCCESS] Loaded {len(dna_data)} base pairs from FASTA file.")
+    
+    # Step 2: Transcription
+    rna_data = transcribe_dna(dna_data)
+    print("[SUCCESS] DNA successfully transcribed into mRNA.")
+    
+    # Step 3: Translation
+    final_protein = translate_rna(rna_data)
+    print("[SUCCESS] Translation sequence finalized.")
+    
+    # --- Clean Summary Table ---
+    print("\n" + "-"*50)
+    print("     ANALYSIS METRICS SUMMARY")
+    print("-"*50)
+    print(f" Input DNA Length  : {len(dna_data)} bp")
+    print(f" Output Protein    : {len(final_protein)} aa")
+    print(f" Unknown Residues  : {final_protein.count('?')} detected")
+    print("-"*50)
+    
+    print("\nFINAL PROTEIN PRODUCT:")
+    print(f" {final_protein}")
+    print("="*50 + "\n")
+
+# If the specified FASTA file cannot be found, catch the FileNotFoundError and print an error message to inform the user about the issue and suggest verifying the system folder path layout.
 except FileNotFoundError:
-    print("Error: The file could not be found! Please double-check your folder path.")
+    print("\n" + "="*50)
+    print("     ERROR: FILE NOT FOUND")
+    print("="*50)
+    print(" Please verify that your system folder path layout is configured correctly.")
+    print("="*50 + "\n")
